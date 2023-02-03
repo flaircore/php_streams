@@ -1,0 +1,20 @@
+{
+    "name": "nick/php_streams",
+    "description": "Uploading files in php using stream requests",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Nick\\PhpStreams\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nickbahson",
+            "email": "nijoba33@gmail.com"
+        }
+    ],
+    "require": {
+        "aws/aws-sdk-php": "^3.258"
+    }
+}
