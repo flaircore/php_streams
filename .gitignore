@@ -8,3 +8,5 @@ dist/
 #Log files
 .pnp.cjs
 .pnp.loader.mjs
+
+uploads/*
