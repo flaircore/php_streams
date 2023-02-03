@@ -1,3 +1,10 @@
 .idea/
 vendor/
 .env
+node_modules/
+dist/
+.yarn/
+
+#Log files
+.pnp.cjs
+.pnp.loader.mjs

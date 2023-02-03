@@ -1,0 +1,8 @@
+.custom-file {
+
+  #custom-file-upload-progress #progress-bar {
+    border: 2px dashed #30412b;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
