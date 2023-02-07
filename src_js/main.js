@@ -10,11 +10,6 @@ import "./main.scss"
             this.uploadProgress = document.querySelector('#file-upload-progress')
             const submit = document.querySelector('[name="file-upload-submit"]')
             submit.addEventListener('click', (e) => this.uploadInit(e))
-            console.log("--------------- BTN --------------------")
-            console.log("--------------- BTN --------------------")
-            console.log(submit)
-            console.log("--------------- BTN --------------------")
-            console.log("--------------- BTN --------------------")
         }
 
         /**
@@ -89,7 +84,7 @@ import "./main.scss"
 
                         // Update upload progress
                         this.uploadProgress.querySelector('label').innerText = `File upload progress:  ${percentDone}%`
-                        this.uploadProgress.querySelector('progress').innerText = `File upload progress:  ${percentDone}%`
+                        this.uploadProgress.querySelector('progress').innerText = `${percentDone}%`
                         this.uploadProgress.querySelector('progress').value = percentDone
 
                         // Upload till the last slice.
