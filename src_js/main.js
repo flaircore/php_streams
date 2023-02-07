@@ -1,42 +1,129 @@
-import axios, {isCancel, AxiosError} from 'axios';
-
-
 import "./main.scss"
 
-(function (  ){
+(function (){
 
-    const file = document.querySelector('input#fileUpload')
-    file.addEventListener('change', readFileToUpload)
-    async function readFileToUpload() {
-        const file = this.files[0]
-        console.log(file)
-
-        const reader = new FileReader()
-
-        reader.onload = function (){
-            console.log(this.result)
+    class FileUploader {
+        constructor() {
+            this.reader = {}
+            this.file = {}
+            this.sliceSize = 1000 * 1024 // page size
+            this.uploadProgress = document.querySelector('#file-upload-progress')
+            const submit = document.querySelector('[name="file-upload-submit"]')
+            submit.addEventListener('click', (e) => this.uploadInit(e))
+            console.log("--------------- BTN --------------------")
+            console.log("--------------- BTN --------------------")
+            console.log(submit)
+            console.log("--------------- BTN --------------------")
+            console.log("--------------- BTN --------------------")
         }
 
-        reader.readAsArrayBuffer(file)
-        //reader.readAsText(file)
+        /**
+         * Uploads the file after upload btn click
+         * @param event
+         */
+        uploadInit(event){
+            event.preventDefault()
 
+            this.reader = new FileReader()
+            this.file = document.querySelector( '#file-upload-input' ).files[0];
+
+            this.uploadFile( 0 );
+
+        }
+
+        /**
+         * Uploads the file recursively and calls moveUploadedFile,
+         * once upload is complete.
+         * @param start
+         */
+        uploadFile(start) {
+            let nextSlice = start + this.sliceSize + 1;
+            let blob = this.file.slice( start, nextSlice );
+
+            this.reader.onerror = (event) => {
+                console.warn('+********************* ERROR *******************')
+                console.warn(event)
+                console.warn('+********************* ERROR *******************')
+            }
+
+            this.reader.onprogress = (event) => {
+                console.log('+********************* onprogress *******************')
+                console.log(event)
+                console.log('+********************* onprogress *******************')
+            }
+
+
+
+            this.reader.onload = async (event) => {
+                const url = window.location.href
+                const data = {
+                    file_data: event.target.result,
+                    file: this.file.name,
+                    file_type: this.file.type,
+                    content_length: this.file.size,
+                    nonce: "a secure token to verify request"
+                }
+
+                const headers =  {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    mode: 'same-origin',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    headers,
+                    referrerPolicy: 'same-origin',
+                    body: JSON.stringify(data)
+                })
+                // Success fetch
+                if ( res.ok ) {
+                    let sizeDone = start + this.sliceSize;
+                    let fractionDone = sizeDone / this.file.size
+                    let percentDone = Math.floor( fractionDone * 100 );
+
+                    // Upload remaining parts
+                    if ( nextSlice < this.file.size ) {
+
+                        // Update upload progress
+                        this.uploadProgress.querySelector('label').innerText = `File upload progress:  ${percentDone}%`
+                        this.uploadProgress.querySelector('progress').innerText = `File upload progress:  ${percentDone}%`
+                        this.uploadProgress.querySelector('progress').value = percentDone
+
+                        // Upload till the last slice.
+                        this.uploadFile(nextSlice)
+                    } else {
+
+                        // Upload complete.
+                        this.uploadProgress.querySelector('progress').innerText = `File upload progress:  ${percentDone}%`
+                        this.uploadProgress.querySelector('progress').value = percentDone
+                        this.uploadProgress.querySelector('label').innerText = 'Upload Complete!'
+
+                        // Move file from local storage to aws s3 bucket.
+                        this.moveUploadedFile()
+                    }
+                }
+                else {
+                    console.warn("Failed to upload file!!!")
+                }
+
+            }
+
+
+            this.reader.readAsDataURL( blob );
+
+        }
+
+        /**
+         * Instructs the server to move the uploaded file.
+         */
+        moveUploadedFile(){
+
+        }
     }
 
-
-    // axios.request({
-    //     method: "post",
-    //     url: "/aaa",
-    //     data: myData,
-    //     onUploadProgress: (p) => {
-    //         console.log(p);
-    //         //this.setState({
-    //         //fileprogress: p.loaded / p.total
-    //         //})
-    //     }
-    // }).then (data => {
-    //     //this.setState({
-    //     //fileprogress: 1.0,
-    //     //})
-    // })
+    const test = new FileUploader()
 
 })()
