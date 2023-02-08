@@ -1,3 +1,4 @@
+.ddev/
 .idea/
 vendor/
 .env
@@ -8,5 +9,6 @@ dist/
 #Log files
 .pnp.cjs
 .pnp.loader.mjs
+.yarnrc.yml
 
 uploads/*

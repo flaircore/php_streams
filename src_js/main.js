@@ -2,6 +2,8 @@ import "./main.scss"
 
 (function (){
 
+    const url = window.location.href
+
     class FileUploader {
         constructor() {
             this.reader = {}
@@ -41,16 +43,8 @@ import "./main.scss"
                 console.warn('+********************* ERROR *******************')
             }
 
-            this.reader.onprogress = (event) => {
-                console.log('+********************* onprogress *******************')
-                console.log(event)
-                console.log('+********************* onprogress *******************')
-            }
-
-
-
             this.reader.onload = async (event) => {
-                const url = window.location.href
+
                 const data = {
                     file_data: event.target.result,
                     file: this.file.name,
@@ -96,13 +90,17 @@ import "./main.scss"
                         this.uploadProgress.querySelector('progress').value = percentDone
                         this.uploadProgress.querySelector('label').innerText = 'Upload Complete!'
 
+
                         // Move file from local storage to aws s3 bucket.
-                        this.moveUploadedFile()
+                        await this.moveUploadedFile()
+
                     }
+
                 }
                 else {
                     console.warn("Failed to upload file!!!")
                 }
+
 
             }
 
@@ -114,7 +112,35 @@ import "./main.scss"
         /**
          * Instructs the server to move the uploaded file.
          */
-        moveUploadedFile(){
+        async moveUploadedFile(){
+            console.log('Moving the file now.........')
+            const data = {
+                move_uploaded: true,
+                file: this.file.name,
+                file_type: this.file.type,
+                content_length: this.file.size,
+                nonce: "a secure token to verify request"
+            }
+
+            const headers =  {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+
+            const res = await fetch(url, {
+                method: 'POST',
+                mode: 'same-origin',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers,
+                referrerPolicy: 'same-origin',
+                body: JSON.stringify(data)
+            })
+
+            if (res.ok) {
+                console.log('File moved and deleted..................')
+            }
+
 
         }
     }
